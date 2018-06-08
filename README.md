@@ -343,7 +343,7 @@ local valid, value = validation:unescapeuri():crc32()("https://github.com/")
 #### resty.validation.tz extension
 
 This set of validators and filters is based on the great [`luatz`](https://github.com/daurnimator/luatz)
-library by @daurnimator, that is a library for time and date manipulation. To use this extension, all you need
+library by [@daurnimator](https://github.com/daurnimator), that is a library for time and date manipulation. To use this extension, all you need
 to do is:
 
 ```lua
@@ -359,7 +359,7 @@ It will monkey patch the adapters that it will provide in `resty.validation`, an
 
 `totimestamp` and `totimetable` filters work great with HTML5 date and datetime input fields. As the name
 tells, `totimetable` returns luatz `timetable` and `totimestamp` returns seconds since unix epoch (`1970-01-01`)
-as a lua number.
+as a Lua number.
 
 ##### Example
 
@@ -451,7 +451,7 @@ This quickly gets a little bit dirty, and that's why we have Group validators.
 
 ### table validation.new([table of validators])
 
-This function is where the group validation kicks in. No say that you have a registration
+This function is where the group validation kicks in. Say that you have a registration
 form that asks you nick, email (same twice), and password (same twice).
 
 We will reuse the single validators, defined in `validators` module:

@@ -1,16 +1,16 @@
 -- This file was automatically generated for the LuaDist project.
 
 package = "lua-resty-validation"
-version = "2.4-1"
+version = "2.5-1"
 -- LuaDist source
 source = {
-  tag = "2.4-1",
+  tag = "2.5-1",
   url = "git://github.com/LuaDist-testing/lua-resty-validation.git"
 }
 -- Original source
 -- source = {
 --     url = "git://github.com/bungle/lua-resty-validation.git",
---     branch = "v2.4"
+--     branch = "v2.5"
 -- }
 description = {
     summary = "Validation Library (Input Validation and Filtering) for Lua and OpenResty",
@@ -28,6 +28,7 @@ build = {
         ["resty.validation"]           = "lib/resty/validation.lua",
         ["resty.validation.tz"]        = "lib/resty/validation/tz.lua",
         ["resty.validation.ngx"]       = "lib/resty/validation/ngx.lua",
+        ["resty.validation.utf8"]      = "lib/resty/validation/utf8.lua",
         ["resty.validation.injection"] = "lib/resty/validation/injection.lua"
     }
 }

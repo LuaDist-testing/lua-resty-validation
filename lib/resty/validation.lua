@@ -24,7 +24,7 @@ local tointeger = math.tointeger
 local abs = math.abs
 local unpack = unpack or table.unpack
 local nothing = {}
-local inf = 1 / 0
+local inf = math.huge
 local sreverse = string.reverse
 local stopped = {}
 local operators = { "<=", ">=", "==", "~=", "<", ">" }
@@ -413,6 +413,11 @@ function factory.email()
         if q or find(lp, "..", 1, true) or find(dp, "..", 1, true) then return false end
         if match(lp, "^%s+") or match(dp, "%s+$") then return false end
         return match(value, "%w*%p*@+%w*%.?%w*") ~= nil
+    end
+end
+function factory.call(func)
+    return function(value)
+        return func(value)
     end
 end
 function factory.optional(default)

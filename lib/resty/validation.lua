@@ -1,4 +1,4 @@
-local _VERSION = "2.6"
+local _VERSION = "2.7"
 local setmetatable = setmetatable
 local getmetatable = getmetatable
 local rawget = rawget
@@ -683,6 +683,9 @@ function group:requisites(r, n)
             end
         end
     end
+end
+function group:call(func)
+    self[#self+1] = func
 end
 function group:__call(data)
     local results = setmetatable({}, fields)

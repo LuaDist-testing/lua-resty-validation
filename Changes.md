@@ -1,6 +1,12 @@
-# Change Log
+# Changelog
 
 All notable changes to `lua-resty-validation` will be documented in this file.
+
+## [2.6] - 2017-02-05
+### Added
+- Added callable validator
+- Added requisite and requisites group validators
+  (see also: https://github.com/bungle/lua-resty-validation/issues/3)
 
 ## [2.5] - 2016-09-29
 ### Added
@@ -27,7 +33,7 @@ All notable changes to `lua-resty-validation` will be documented in this file.
 - Fixed leaking global new function.
 
 ## [2.1] - 2015-10-10
-### Changes
+### Changed
 - Total rewrite.
 
 ## [1.0] - 2014-08-28

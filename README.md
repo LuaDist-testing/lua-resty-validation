@@ -17,7 +17,7 @@ local valid, e = smallnumber(50) -- valid = false, e = "between"
 
 -- Validators can do filtering (i.e. modify the value being validated)
 -- valid = true, s = "HELLO WORLD!"
-local valid, s = validation.string.upper("hello world!")
+local valid, s = validation.string.upper "hello world!"
 
 -- You may extend the validation library with your own validators and filters...
 validation.validators.capitalize = function(value) 
@@ -25,7 +25,7 @@ validation.validators.capitalize = function(value)
 end
 
 -- ... and then use it
-local valid, e = validation.capitalize("abc") -- valid = true,  e = "Abc"
+local valid, e = validation.capitalize "abc" -- valid = true,  e = "Abc"
 
 -- You can also group validate many values
 local group = validation.new{
@@ -49,19 +49,19 @@ end
 
 -- By default this returns only the valid fields' names and values:
 local data = fields()
-local data = fields("valid")
+local data = fields "valid"
 
 -- To get only the invalid fields' names and values call:
-local data = fields("invalid")
+local data = fields "invalid"
 
 -- To get only the validated fields' names and values call (whether or not they are valid):
-local data = fields("validated")
+local data = fields "validated"
 
 -- To get only the unvalidated fields' names and values call (whether or not they are valid):
-local data = fields("unvalidated")
+local data = fields "unvalidated"
 
 -- To get all, call:
-local data = fields("all")
+local data = fields "all"
 
 -- Or combine:
 local data = fields("valid", "invalid")
@@ -73,9 +73,13 @@ local data = data{ "artist" }
 
 ## Installation
 
-Just place [`validation.lua`](https://github.com/bungle/lua-resty-validation/blob/master/lib/resty/validation.lua)
-somewhere in your `package.path`, preferably under `resty` directory. If you are using OpenResty, the default
-location would be `/usr/local/openresty/lualib/resty`.
+Just place [`validation.lua`](https://github.com/bungle/lua-resty-validation/blob/master/lib/resty/validation.lua) and [`validation`](https://github.com/bungle/lua-resty-template/tree/master/lib/resty/validation) directory somewhere in your `package.path`, under `resty` directory. If you are using OpenResty, the default location would be `/usr/local/openresty/lualib/resty`.
+
+### Using OpenResty Package Manager (opm)
+
+```Shell
+$ opm get bungle/lua-resty-validation
+```
 
 ### Using LuaRocks
 
@@ -83,7 +87,7 @@ location would be `/usr/local/openresty/lualib/resty`.
 $ luarocks install lua-resty-validation
 ```
 
-LuaRocks repository for `lua-resty-validation` is located here: https://luarocks.org/modules/bungle/lua-resty-validation.
+LuaRocks repository for `lua-resty-validation` is located at https://luarocks.org/modules/bungle/lua-resty-validation.
 
 ## Built-in Validators and Filters
 
@@ -101,6 +105,7 @@ validators (call them with dot `.`):
 * `table`
 * `userdata`
 * `func` or `["function"]` (as the function is a reserved keyword in Lua)
+* `callable` (either a function or a table with metamethod `__call`)
 * `thread`
 * `integer`
 * `float`
@@ -158,6 +163,7 @@ Validation factory consist of different validators and filters used to validate 
 * `table()`, check that value type is `table`
 * `userdata()`, check that value type is `userdata`
 * `func()` or `["function"]()`, check that value type is `function`
+* `callable()`, check that value is callable (aka a function or a table with metamethod `__call`)
 * `thread()`, check that value type is `thread`
 * `integer()`, check that value type is `integer`
 * `float()`, check that value type is `float`
@@ -236,9 +242,11 @@ Every other argument is passed to the actual validation factory validator.
 
 ### Group Validators
 
-`lua-resty-validation` currently supports one predefined validator, and that is:
+`lua-resty-validation` currently supports a few predefined validators:
 
-* `compare(comparison)`, compares two fields and sets fields invalid or valid according to comparison:
+* `compare(comparison)`, compares two fields and sets fields invalid or valid according to comparison
+* `requisite{ fields }`, at least of of the requisite fields is required, even if they by themselves are optional
+* `requisites({ fields }, number)`, at least `number` of requisites fields are required (by default all of them)
 
 ```lua
 local ispassword = validation.trim:minlen(8)
@@ -248,6 +256,24 @@ local group = validation.new{
 }
 group:compare "password1 == password2"
 local valid, fields, errors = group{ password1 = "qwerty123", password2 = "qwerty123" }
+
+local optional = validation:optional"".trim
+local group = validation.new{
+    text = optional,
+    html = optional
+}
+group:requisite{ "text", "html" }
+local valid, fields, errors = group{ text = "", html = "" }
+
+
+local optional = validation:optional ""
+local group = validation.new{
+    text = optional,
+    html = optional
+}
+group:requisites({ "text", "html" }, 2)
+-- or group:requisites{ "text", "html" }
+local valid, fields, errors = group{ text = "", html = "" }
 ```
 
 You can use normal Lua relational operators in `compare` group validator:
@@ -258,6 +284,17 @@ You can use normal Lua relational operators in `compare` group validator:
 * `>=`
 * `==`
 * `~=`
+
+`requisite` and `requisites` check if the field value is `nil` or `""`(empty string).
+With `requisite`, if all the specified fields are `nil` or `""` then all the fields are
+invalid (provided they were not by themselves invalid), and if at least one of the fields
+is valid then all the fields are valid. `requisites` works the same, but there you can
+define the number of how many fields you want to have a value that is not `nil` and not
+an empty string `""`. These provide conditional validation in sense of:
+
+1. I have (two or more) fields
+2. All of them are optional
+3. At least one / defined number of fields should be filled but I don't care which one as long as there is at least one / defined number of fields filled
 
 ### Stop Validators
 
@@ -801,12 +838,23 @@ Calling `state` on field is great when embedding validation results inside say H
 
 So depending on email field's state this will add a class to input element (e.g. making input's border red or green for example). We don't care about unvalidated (e.g. when the user first loaded the page and form) state here.
 
+## Changes
+
+The changes of every release of this module is recorded in [Changes.md](https://github.com/bungle/lua-resty-validation/blob/master/Changes.md) file.
+
+## See Also
+
+* [lua-resty-route](https://github.com/bungle/lua-resty-route) — Routing library
+* [lua-resty-reqargs](https://github.com/bungle/lua-resty-reqargs) — Request arguments parser
+* [lua-resty-session](https://github.com/bungle/lua-resty-session) — Session library
+* [lua-resty-template](https://github.com/bungle/lua-resty-template) — Templating Engine
+
 ## License
 
 `lua-resty-validation` uses two clause BSD license.
 
 ```
-Copyright (c) 2014 - 2016, Aapo Talvensaari
+Copyright (c) 2014 - 2017, Aapo Talvensaari
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,

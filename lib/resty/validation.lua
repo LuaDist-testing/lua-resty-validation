@@ -5,8 +5,10 @@ local select = select
 local tostring = tostring
 local tonumber = tonumber
 local type = type
+local pairs = pairs
 local ipairs = ipairs
 local error = error
+local pcall = pcall
 local match = string.match
 local lower = string.lower
 local upper = string.upper
@@ -469,9 +471,47 @@ function data:__call(...)
     end
     return data
 end
+local field = {}
+field.__index = field
+function field.new(name, input )
+    return setmetatable({
+        name = name,
+        input = input,
+        value = input,
+        valid = true,
+        invalid = false,
+        validated = false,
+        unvalidated = true
+    }, field)
+end
+function field:__tostring()
+    if type(self.value) == "string" then return self.value end
+    return tostring(self.value)
+end
+function field:state(invalid, valid, unvalidated)
+    if self.unvalidated then
+        return unvalidated
+    end
+    return self.valid and valid or invalid
+end
+function field:accept(value)
+    self.error = nil
+    self.value = value
+    self.valid = true
+    self.invalid = false
+    self.validated = true
+    self.unvalidated = false
+end
+function field:reject(error)
+    self.error = error
+    self.valid = false
+    self.invalid = true
+    self.validated = true
+    self.unvalidated = false
+end
 local fields = {}
 function fields:__call(...)
-    local valid, invalid, validatad, unvalidated
+    local valid, invalid, validated, unvalidated
     local argc = select("#", ...)
     if argc == 0 then
         valid = true
@@ -507,37 +547,8 @@ function fields:__call(...)
     end
     return data
 end
-local field = {}
-field.__index = field
-function field.new(name, input )
-    return setmetatable({
-        name = name,
-        input = input,
-        value = input,
-        valid = true,
-        invalid = false,
-        validated = false,
-        unvalidated = true
-    }, field)
-end
-function field:__tostring()
-    if type(self.value) == "string" then return self.value end
-    return tostring(self.value)
-end
-function field:accept(value)
-    self.error = nil
-    self.value = value
-    self.valid = true
-    self.invalid = false
-    self.validated = true
-    self.unvalidated = false
-end
-function field:reject(error)
-    self.error = error
-    self.valid = false
-    self.invalid = true
-    self.validated = true
-    self.unvalidated = false
+function fields:__index()
+    return field.new()
 end
 local group = {}
 group.__index = group
@@ -642,7 +653,7 @@ local function check(validator, value, valid, v)
     return true, v
 end
 local function validation(func, parent_f, parent, method)
-    return setmetatable({ new = new, group = group, nothing = nothing, stop = stop, validators = validators }, {
+    return setmetatable({ new = new, group = group, fields = setmetatable({}, fields), nothing = nothing, stop = stop, validators = validators }, {
         __index = function(self, index)
             return validation(function(...)
                 local valid, value = check(index, select(1, ...), func(...))

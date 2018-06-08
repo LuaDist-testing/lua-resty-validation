@@ -5,7 +5,7 @@ source = {
 }
 description = {
     summary = "Validation Library (Input Validation and Filtering) for Lua and OpenResty",
-    detailed = "ua-resty-validation is an extendable chaining validation and filtering library for Lua and OpenResty.",
+    detailed = "lua-resty-validation is an extendable chaining validation and filtering library for Lua and OpenResty.",
     homepage = "https://github.com/bungle/lua-resty-validation",
     maintainer = "Aapo Talvensaari <aapo.talvensaari@gmail.com>",
     license = "BSD"
@@ -16,7 +16,8 @@ dependencies = {
 build = {
     type = "builtin",
     modules = {
-        ["resty.validation"]                = "lib/resty/validation.lua",
-        ["resty.validation.ngx"]            = "lib/resty/validation/ngx.lua"
+        ["resty.validation"]     = "lib/resty/validation.lua",
+        ["resty.validation.tz"] = "lib/resty/validation/tz.lua",
+        ["resty.validation.ngx"] = "lib/resty/validation/ngx.lua"
     }
 }
